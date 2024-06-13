@@ -1,0 +1,77 @@
+//index.js
+const db = wx.cloud.database({
+  env: '你上面步骤记下的环境id填这里'
+  //  比如env: 'cloud1-233333333....'
+})
+
+Page({
+  data: {
+    // 轮播图数组：
+    swiperList:[],
+    // 导航 数组
+    catesList:[],
+    // 楼层数据
+    floorList:[]
+  },
+  // 页面开始加载就会触发
+  onLoad: function (options) {
+    // 显示加载中效果
+    wx.showLoading({
+      title: '加载中',
+      mask:true
+    })
+    this.getSwiperList();
+    this.getCatesList();
+    this.getFloorList();
+    // 关闭加载中窗口
+    wx.hideLoading()
+  },
+  // 获取轮播图数据
+  getSwiperList(){
+    let that = this
+    // 获取数据库swiperdata数据
+    db.collection("swiperdata").get({
+      success:function(res){
+        console.log(res)
+        that.setData({
+          swiperList:res.data
+        })
+      },
+      fail:function(err){
+        console.log("失败"+err);
+      }
+    });
+  },
+  // 获取分类导航数据
+  getCatesList(){
+    let that = this
+    // 获取数据库catesdata数据
+    db.collection("catesdata").get({
+      success:function(res){
+        that.setData({
+          catesList:res.data
+        })
+      },
+      fail:function(err){
+        console.log("失败"+err);
+      }
+    });
+  },
+  // 获取楼层数据
+  getFloorList(){
+    let that = this
+    // 获取数据库catesdata数据
+    db.collection("floordata").get({
+      success:function(res){
+        console.log(res);
+        // console.log(res.data[0].image_src);
+        that.setData({
+          floorList:res.data
+        })
+      },
+      fail:function(err){
+        console.log("失败"+err);
+      }
+    });
+  },
+})
