@@ -1,0 +1,97 @@
+import sys  
+import pygame  
+from pygame.locals import KEYDOWN, QUIT, K_q, K_ESCAPE, MOUSEBUTTONDOWN  
+from dissipate.level import Manager  
+from dissipate.level_tree import LevelTreeManager  
+from dissipate.sounds import Sounds  
+  
+  
+class Game:  
+    """  
+    游戏主类，负责初始化和主循环  
+    """  
+    def __init__(self):  
+        """  
+        初始化游戏  
+        """        pygame.init()  
+        pygame.mixer.init()  
+        pygame.display.set_caption('开心消消乐')  # 设置游戏窗口标题  
+        pygame.mouse.set_visible(False)  # 隐藏鼠标指针  
+  
+        # 初始化游戏管理器和声音  
+        self.tree = LevelTreeManager()  # 树管理器，用于主菜单  
+        self.manager = Manager(0, 0)  # 游戏管理器，用于处理游戏逻辑  
+        self.world_bgm = pygame.mixer.Sound(Sounds.WORLD_BGM.value)  # 世界背景音乐  
+        self.game_bgm = pygame.mixer.Sound(Sounds.GAME_BGM.value)  # 游戏背景音乐  
+  
+        # 提高游戏性能的优化  
+        self.get_events = pygame.event.get  # 获取事件的方法  
+        self.update_window = pygame.display.flip  # 刷新窗口的方法  
+  
+        self.sound_sign = 0  # 用于控制背景音乐切换的标志  
+  
+    def run(self):  
+        """主游戏循环"""  
+        while True:  
+            self.handle_music()  # 处理背景音乐  
+            self.draw()  # 绘制游戏界面  
+            self.handle_events()  # 处理用户输入事件  
+            self.update()  # 更新显示  
+  
+    def handle_music(self):  
+        """根据游戏级别管理背景音乐"""  
+        if self.manager.level == 0:  
+            if self.sound_sign == 0:  
+                self.game_bgm.stop()  # 停止游戏背景音乐  
+                self.world_bgm.play(-1)  # 循环播放世界背景音乐  
+                self.sound_sign = 1  
+        else:  
+            if self.sound_sign == 1:  
+                self.world_bgm.stop()  # 停止世界背景音乐  
+                self.game_bgm.play(-1)  # 循环播放游戏背景音乐  
+                self.sound_sign = 0  
+  
+    def draw(self):  
+        """根据级别绘制相应的游戏界面"""  
+        if self.manager.level == 0:  
+            self.tree.draw_tree(self.manager.energy_num, self.manager.money)  # 绘制主菜单界面  
+        else:  
+            self.manager.set_level_mode(self.manager.level)  # 设置当前关卡模式  
+            sprite_group = self.manager.draw()  # 绘制游戏关卡界面  
+            if self.manager.type == 0:  
+                self.manager.eliminate_animals()  # 消除动物  
+                self.manager.death_map()  # 更新死亡地图  
+                self.manager.swap(sprite_group)  # 处理交换逻辑  
+            self.manager.judge_level()  # 判断关卡状态  
+  
+    def handle_events(self):  
+        """处理用户输入事件"""  
+        for event in self.get_events():  
+            if event.type == KEYDOWN:  
+                if event.key in (K_q, K_ESCAPE):  
+                    sys.exit()  # 按下 Q 或 ESC 键退出游戏  
+            elif event.type == QUIT:  
+                sys.exit()  # 点击关闭按钮退出游戏  
+            elif event.type == MOUSEBUTTONDOWN:  
+                mouse_x, mouse_y = event.pos  # 获取鼠标点击位置  
+                if self.manager.level == 0:  
+                    self.tree.mouse_select(  
+                        self.manager, mouse_x,  
+                        mouse_y,  
+                        self.manager.level,  
+                        self.manager.energy_num,  
+                        self.manager.money  
+                    )  # 处理主菜单鼠标选择  
+                self.manager.mouse_select(mouse_x, mouse_y)  # 处理游戏内鼠标选择  
+  
+    def update(self):  
+        """  
+        更新鼠标图像并刷新显示  
+        :return:  
+        """        self.manager.mouse_image()  # 更新鼠标图像  
+        self.update_window()  # 刷新显示  
+  
+  
+if __name__ == '__main__':  
+    game = Game()  # 创建游戏实例  
+    game.run()  # 启动游戏
