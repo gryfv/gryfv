@@ -1,0 +1,17 @@
+kernelX = cv2.getStructuringElement(cv2.MORPH_RECT, (30, 10))
+image = cv2.morphologyEx(image, cv2.MORPH_CLOSE, kernelX,iterations = 1)
+# 显示灰度图像
+plt_show(image)
+# 腐蚀（erode）和膨胀（dilate）
+kernelX = cv2.getStructuringElement(cv2.MORPH_RECT, (50, 1))
+kernelY = cv2.getStructuringElement(cv2.MORPH_RECT, (1, 20))
+#x方向进行闭操作（抑制暗细节）
+image = cv2.dilate(image, kernelX)
+image = cv2.erode(image, kernelX)
+#y方向的开操作
+image = cv2.erode(image, kernelY)
+image = cv2.dilate(image, kernelY)
+# 中值滤波（去噪）
+image = cv2.medianBlur(image, 21)
+# 显示灰度图像
+plt_show(image)
