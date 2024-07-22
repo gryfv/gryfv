@@ -1,0 +1,258 @@
+void Input_stu(vector<Student>& stu)
+{
+    system("cls");
+    stu.clear();
+    int i = 0;
+    char sign = '\0';
+    Student temp;
+
+    cout << "============ please input the message ============" << endl;
+    while (sign != 'n' && sign != 'N')
+    {
+    loop:
+        cout << "student ID: ";
+        cin >> temp._id;
+
+        int c = 0;
+        while (c < i)
+        {
+            c++;
+            if (!strcmp(temp._id, stu[i - c]._id))
+            {
+                cout << "ID repeat, please input again." << endl;
+                goto loop;
+            }
+        }
+
+        cout << "name: ";
+        cin >> temp._name;
+        cout << "class: ";
+        cin >> temp._class;
+
+        stu.push_back(temp);            // push_back
+        cout << "whether continue(y or n): ";
+        cin >> sign;
+        i++;
+    }
+    Write_stu(stu, i);
+}
+
+void Delete_stu(vector<Student>& stu)
+{
+    system("cls");
+    int n = Read_stu(stu);
+    int m = Read_course(cour);  // number of course
+    int i = 0;
+    char id[20];
+
+    cout << "============ delete student ============" << endl;
+    cout << "please input the ID of student who you want to delete: ";
+    cin >> id;
+
+    while (i < n && strcmp(id, stu[i]._id))
+        i++;
+
+    if (i == n)
+    {
+        cout << "no fount." << endl;
+        system("pause");
+        return;
+    }
+
+    if (stu[i]._num_compulsory)
+    {
+        while (stu[i]._num_compulsory > 0)
+        {
+            stu[i]._num_compulsory--;
+
+            int c = 0;
+            while (c < m)
+            {
+                if (!strcmp(stu[i]._cour_compulsory[stu[i]._num_compulsory].id, cour[c].id))
+                {
+                    cour[c].count--;
+                    break;
+                }
+                c++;
+            }
+        }
+    }
+    else if (stu[i]._num_elective)
+    {
+        while (stu[i]._num_elective > 0)
+        {
+            stu[i]._num_elective--;
+
+            int c = 0;
+            while (c < m)
+            {
+                if (!strcmp(stu[i]._cour_elective[stu[i]._num_elective].id, cour[c].id))
+                {
+                    cour[c].count--;
+                    break;
+                }
+                c++;
+            }
+        }
+    }
+
+    for (int j = i; j < n - 1; j++)
+        swap(stu[j], stu[j + 1]);
+
+    // save
+    char sign;
+    cout << "whether delete(y or n): ";
+    cin >> sign;
+    if (sign != 'n' && sign != 'N')
+    {
+        stu.erase(stu.end() - 1);
+        Write_stu(stu, n - 1);
+        Write_course(cour, m);
+        cout << "============ delete succeed ============" << endl;
+        system("pause");
+    }
+}
+
+void Modify_stu(vector<Student>& stu)
+{
+    system("cls");
+    int n = Read_stu(stu);
+    char id[20];
+    int i = 0;
+
+    cout << "============ Modify the message of student ============" << endl;
+    cout << "please input the ID of student who you want to modify: ";
+    cin >> id;
+
+    while (i < n && strcmp(id, stu[i]._id))
+        i++;
+
+    if (i == n)
+    {
+        cout << "no found." << endl;
+        system("pause");
+        return;
+    }
+
+    cout << "-------------------------------------------------------" << endl;
+    cout << "ID: " << stu[i]._id << endl;
+    cout << "class: " << stu[i]._class << endl;
+    cout << "name: " << stu[i]._name << endl;
+    cout << "-------------------------------------------------------" << endl;
+
+    cout << "please reenter the message." << endl;
+    cout << "class: ";
+    cin >> stu[i]._class;
+    cout << "name: ";
+    cin >> stu[i]._name;
+
+    // save
+    char sign;
+    cout << "whether save the data(y or n): ";
+    cin >> sign;
+    if (sign != 'n' && sign != 'N')
+    {
+        cout << "modify succeed." << endl;                                                                                    
+        Write_stu(stu, n);
+        system("pause");
+    }
+}
+
+void Lookup_stu(vector<Student>& stu)
+{
+    system("cls");    
+    int n = Read_stu(stu);
+    Read_course(cour);
+    int i = 0;
+    char id[20];  
+    
+    cout << "============ Lookup the score of student ============" << endl;    
+    cout << "please input the ID of student you want to seek: ";
+    cin >> id;
+
+    while (i < n && strcmp(id, stu[i]._id))
+        i++;
+    
+    if (i == n)
+    {
+        cout << "no found." << endl;
+    }
+    else
+    { 
+        cout << "ID: " << stu[i]._id << endl;
+        cout << "class: " << stu[i]._class << endl;
+        cout << "name: " << stu[i]._name << endl;
+        cout << "compulsory: " << (!strcmp(stu[i]._cour_compulsory[0].id, "None") ? "None" : stu[i]._cour_compulsory[0].c_name())
+             << " " 
+             << (!strcmp(stu[i]._cour_compulsory[1].id, "None") ? "None" : stu[i]._cour_compulsory[1].c_name()) 
+             << endl;
+        cout << "elective: " 
+             << (!strcmp(stu[i]._cour_elective[0].id, "None") ? "None" : stu[i]._cour_elective[0].c_name()) 
+             << endl;
+    }
+    system("pause");
+}
+
+void Add_stu(vector<Student>& stu) 
+{
+    system("cls");
+    int n = Read_stu(stu);
+    char sign = '0';
+    Student temp;
+
+    cout << "============ add student ============" << endl;
+    while (sign != 'n' && sign != 'N')
+    {
+    loop:
+        cout << "student ID: ";
+        cin >> temp._id;
+
+        int c = 0;
+        while (c < n)
+        {
+            c++;
+            if (!strcmp(temp._id, stu[n - c]._id))
+            {
+                cout << "ID repeat, please input again." << endl;
+                goto loop;
+            }
+        }
+
+        cout << "class: ";
+        cin >> temp._class;
+        cout << "name: ";
+        cin >> temp._name;
+        n++;
+
+        stu.push_back(temp);                    // push_back
+
+        cout << "whether continue(y or n): ";
+        cin >> sign;
+    }
+
+    // save
+    Write_stu(stu, n);
+}
+
+void Show_stu(vector<Student>& stu)
+{   
+    system("cls");                                                                                                        
+    int n = Read_stu(stu);
+
+    cout << "============================ diplay all student ==========================" << endl;
+    cout << "ID" << "\t" << "class" << "\t" << "name" << "\t" 
+         << "compulsory" << "\t\t" << "elective" << endl;   
+    cout << "--------------------------------------------------------------------------" << endl;
+    for (int i = 0; i < n; i++)
+    {
+        cout << stu[i]._id << "\t" << stu[i]._class << "\t" << stu[i]._name << "\t" 
+            << (!strcmp(stu[i]._cour_compulsory[0].id, "None") ? "None" : stu[i]._cour_compulsory[0].name)
+            << " "
+            << (!strcmp(stu[i]._cour_compulsory[1].id, "None") ? "None" : stu[i]._cour_compulsory[1].c_name())
+            << "\t"
+            << (!strcmp(stu[i]._cour_elective[0].id, "None") ? "None" : stu[i]._cour_elective[0].c_name()) 
+            << endl;
+    }
+
+    system("pause");
+}
