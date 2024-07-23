@@ -1,0 +1,17 @@
+ //图片
+    @Test
+    public void test4() throws IOException {
+        //文本
+        String path = "D:\\ml\\idea\\jishedemo1\\src\\main\\resources\\doc\\img.docx";
+        XWPFTemplate template = XWPFTemplate.compile(path);
+        Map<String,Object> map= new HashMap<>();
+        //本地图片
+        PictureRenderData img=Pictures.of("C:\\Users\\王\\OneDrive\\屏幕截图 2024-07-15 094619.png").create();
+        //网络图片
+        PictureRenderData img2=Pictures.ofUrl("https://p3.itc.cn/images01/20230925/43d7f951f84549d69fdaa790d1d5dbeb.png").size(300,300).create();
+        map.put("img",img);
+        map.put("urlImg",img2);
+ 
+        template.render(map);
+        template.writeAndClose(new FileOutputStream("D:\\ml\\idea\\jishedemo1\\src\\main\\resources\\doc\\img1.docx"));
+    }
